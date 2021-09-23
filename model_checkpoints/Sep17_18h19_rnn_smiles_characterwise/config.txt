@@ -1,0 +1,87 @@
+{
+    "model_config": {
+        "vocab_size": 70,
+        "embedding_dim": 128,
+        "embedding_share": true,
+        "source_reverse": false,
+        "cnn_config": {
+            "depth": 1,
+            "kernel_sizes": [
+                1,
+                3,
+                5
+            ],
+            "n_filters": 128,
+            "residual_connect": false,
+            "layer_norm": false
+        },
+        "encoder_rnn_config": {
+            "hidden_dim": 128,
+            "depth": 1,
+            "dropout_rate_input": 0.2,
+            "dropout_rate_output": 0.0,
+            "residual_connect": null,
+            "bidirectional_encoding": true
+        },
+        "state_bridge": "zero",
+        "decoder_rnn_config": {
+            "hidden_dim": 128,
+            "depth": 1,
+            "dropout_rate_input": 0.2,
+            "dropout_rate_output": 0.0,
+            "residual_connect": null
+        },
+        "attention_config": {
+            "attention_mechanism": "Luong",
+            "attention_dim": 128,
+            "append_context": true
+        }
+    },
+    "data": {
+        "language": "smiles",
+        "tokenizer": "characterwise",
+        "bpe_file": "SPE_ChEMBL.txt",
+        "include_reaction_label": true,
+        "frequency_threshold": 3,
+        "data_dir": "USPTO-50K-SMILES/",
+        "max_input_length": 200,
+        "max_output_length": 200
+    },
+    "training_config": {
+        "batch_size": 32,
+        "epochs": 1000,
+        "optimizer": {
+            "class_name": "Adam",
+            "config": {
+                "learning_rate": 0.001,
+                "beta_1": 0.9,
+                "beta_2": 0.999,
+                "epsilon": 1e-07,
+                "clipnorm": 5.0
+            }
+        },
+        "exponential_decay_lr": false,
+        "exponential_decay_lr_config": {
+            "initial_learning_rate": 0.0001,
+            "decay_rate": 0.99,
+            "decay_steps": 100,
+            "min_learning_rate": 1e-12,
+            "staircase": false
+        },
+        "cyclic_lr": false,
+        "cyclic_lr_config": {
+            "base_lr": 0.0,
+            "max_lr": 0.001,
+            "epochs_per_cycle": 10,
+            "warm_up_epochs": 3
+        },
+        "transformer_lr": false,
+        "transformer_lr_config": {
+            "warm_up_epochs": 26,
+            "model_dim": 64
+        },
+        "save_freq": 4,
+        "save_dir": "model_checkpoints/Sep17_18h19_rnn_smiles_characterwise/",
+        "initial_epoch": 0
+    }
+}
