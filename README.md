@@ -37,7 +37,15 @@ Checkpoints during training are saved in the [model_checkpoints](./model_checkpo
 ## Inferring
 RNN and Transformer share a same [infer_script.py](./infer_script.py) file. Open the file and tune the hyper-parameters to your preference, save and run.
 
-Inferring results are saved as a .npz file under the [predictions_and_evaluation](./predictions_and_evaluation) directory.
+Inferring results are saved as a `.npz` file under the [predictions_and_evaluation](./predictions_and_evaluation) directory.
+The content of the `.npz` file includes the following key words:
+
+* `'ids'` The inferred sequences representing the reactants in the form of character indices.
+* `'strings'` The inferred sequences representing the reactants in the form of characters.
+* `'lengths'` Lengths of the inferred sequences.
+* `'log_probs'` Log probability of the every characters of the output sequences.
+* `'inference_time'` Inference time in second.
+* `'attention'` The attention matrices. This key word will not be inlucded if no attention mechanism is used.
 
 ## Evaluate
 
