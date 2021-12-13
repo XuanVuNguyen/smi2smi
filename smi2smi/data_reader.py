@@ -1,9 +1,12 @@
 import collections
 import numpy as np
 from tensorflow import keras
+from rdkit.Chem import AllChem
 import selfies as sf
 from SmilesPE.tokenizer import SPE_Tokenizer
 from SmilesPE.pretokenizer import atomwise_tokenizer
+from rdkit import RDLogger
+RDLogger.DisableLog('rdApp.*')
 
 
 class MolecularTokenizer:
@@ -11,7 +14,7 @@ class MolecularTokenizer:
                  input_language,
                  tokenizer,
                  bpe_file=None):
-        self._input_lang = input_language
+        self._input_lang = input_language.lower()
         self._bpe_file = bpe_file
         
         if bpe_file is not None:
@@ -37,7 +40,10 @@ class MolecularTokenizer:
                     raise ValueError('A BPE file is required for BPE tokenizer.')
             
             if tokenizer=='atomwise':
-                self._tokenizer = atomwise_tokenizer
+                self._tokenizer = self._smiles_atomwise_tokenizer
+                
+    def _smiles_atomwise_tokenizer(self, string):
+        return ' '.join(atomwise_tokenizer(string))
     
     def _smiles_characterwise_tokenizer(self, string):
         return ' '.join(list(string))
@@ -113,9 +119,7 @@ class MolecularTokenizer:
     def indices_to_strings(self, sequences):
         return np.array([string.replace(' ', '') for string in self.indices_to_chars(sequences)])
     
-    def tokenize_from_file(self, file_path, include_reaction_label=True):
-        with open(file_path, 'r') as file:
-            string_list = file.read().splitlines()
+    def tokenize_from_string_list(self, string_list, include_reaction_label=True):
         if len(string_list[0].split(' '))==2:
             molecules = [string.split(' ')[-1] for string in string_list]
             if include_reaction_label:
@@ -131,6 +135,10 @@ class MolecularTokenizer:
             tokenized_strings = [' '.join([label, molecule]) \
                                  for label, molecule in zip(reaction_labels, tokenized_strings)]
         return tokenized_strings
+    def tokenize_from_file(self, file_path, include_reaction_label=True):
+        with open(file_path, 'r') as file:
+            string_list = file.read().splitlines()
+        self.tokenize_from_string_list(string_list, include_reaction_label=include_reaction_label)
     
     def sos_prepend(self, tokenized_strings):
         return [' '.join(['[SEQ_START]', string]) for string in tokenized_strings]
@@ -147,3 +155,46 @@ class MolecularTokenizer:
             return self._num_words-1
         else:
             return len(self._token_lookup.word_index)-1
+        
+def grammar_check(smi):
+        if AllChem.MolFromSmiles(smi) is None:
+            return False
+        else:
+            return True
+        
+def canonicalize(strings, selfies):
+    if len(strings.shape)==2:
+        n_examples, beam_width = strings.shape
+        strings = np.reshape(strings, (n_examples*beam_width))
+        reshape = True
+    else:
+        reshape = False
+    if selfies:
+        strings = [sf.decoder(string) for string in strings]
+    canonical_strings = [AllChem.MolToSmiles(AllChem.MolFromSmiles(string)) if \
+                      grammar_check(string) else ''
+                      for string in strings]
+    if selfies:
+        canonical_strings = np.array([sf.encoder(string) for string in canonical_strings])
+    if reshape==True:
+        canonical_strings = np.reshape(canonical_strings, (n_examples, beam_width))
+    
+    return canonical_strings
+
+def load_npz(results_path):
+    with np.load(results_path) as beam_search_results:
+        ids = beam_search_results['ids']
+        strings = beam_search_results['strings']
+        lengths = beam_search_results['lengths']
+        log_probs = beam_search_results['log_probs']
+        inference_time = beam_search_results['inference_time']
+        if 'attention' in beam_search_results.keys():
+            attention = beam_search_results['attention']
+        else:
+            attention = None
+    return {'ids':ids, 
+            'strings':strings, 
+            'lengths':lengths, 
+            'log_probs':log_probs,
+            'inference_time':inference_time,
+            'attention':attention}

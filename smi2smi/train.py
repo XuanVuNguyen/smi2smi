@@ -93,7 +93,7 @@ class LRTensorBoard(TensorBoard):
         
 class CustomCyclicLR(Callback):
     '''
-    Aaaaaaaaaaa
+   
     '''
     def __init__(self, max_lr=0.0012, iters_per_cycle=2000., warm_up=16000):
         super(CustomCyclicLR, self).__init__()

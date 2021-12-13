@@ -79,6 +79,7 @@ def infer_and_save(inference_model, indices_to_strings, padded_inputs, batch_siz
     
 def filter_output_ids(results_ids):
     '''
+    Index sequences containing zero (padding index) or not ending with SEQUENCEE_END index are
     Args:
      results_ids: np.ndarray shape==(N, beamwidth, len).
     Returns:
