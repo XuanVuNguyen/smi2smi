@@ -13,12 +13,7 @@ from smi2smi.data_reader import canonicalize, grammar_check
 
 def evaluate(predicted_strings, groundtruths, top_k, selfies):
     '''
-    Args:
-     inferred_results: a dict contains the output of inference, containing keywords: ['ids', 'strings', 'lengths', 'log_probs', 'inference_time', 'attention'].
-     groundtruths: the groundtruth sequences.
-     top_k: Only the sequences with the highest top_k log probs are picked for evaluation with groudtruths
-    Returns:
-     
+    
     ''' 
     n_examples = groundtruths.shape[0]
     canonicalized_predicted_strings = canonicalize(predicted_strings, selfies=selfies)
