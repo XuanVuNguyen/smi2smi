@@ -1,5 +1,5 @@
 # Overview
-This project is my internship project for my bachelor graduation. You read see my thesis [here](https://drive.google.com/file/d/1TrVG1kOC_gD-_nRe7x4Mb1rwvsEXr2be/view?usp=sharing).
+This project is my internship project for my bachelor graduation. You can read my thesis [here](https://drive.google.com/file/d/1TrVG1kOC_gD-_nRe7x4Mb1rwvsEXr2be/view?usp=sharing).
 
 In this project, I aimed at using machine learning to solve the problem of retrosynthesis analysis, 
 i.e. given a target organic molecule, a set of reactants compounds, which can react to form the target, are deduced.
@@ -32,7 +32,7 @@ python transformer_train_script.py
 ```
 if Transformer.
 
-Checkpoints during training are saved in the [model_checkpoints](./model_checkpoints) directory, along with the config of the models
+Checkpoints during training are saved in the [model_checkpoints](./model_checkpoints) directory, along with the config of the models.
 
 ## Inferring
 RNN and Transformer share a same [infer_script.py](./infer_script.py) file. Open the file and tune the hyper-parameters to your preference, save and run:
